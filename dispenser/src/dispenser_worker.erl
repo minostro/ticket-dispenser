@@ -1,4 +1,4 @@
-%%% @author   Milton Inostroza <milinostroza@groupon.com>
+%%% @author   Milton Inostroza <minostro@minostro.com>
 %%% @copyright  2015  Milton Inostroza.
 %%% @doc
 
@@ -6,7 +6,7 @@
 -behaviour(gen_server).
 -define(SERVER, ?MODULE).
 
--author('Milton Inostroza <milinostroza@groupon.com>').
+-author('Milton Inostroza <minostro@minostro.com>').
 -record(state, {ticket_id = 0}).
 %% ------------------------------------------------------------------
 %% API Function Exports
