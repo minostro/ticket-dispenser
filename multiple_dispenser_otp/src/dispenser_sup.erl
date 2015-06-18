@@ -29,22 +29,14 @@ start_link() ->
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
   ChildSpec = {
-    dispenser_worker,
-    {dispenser_worker, start_link, []},
+    dispenser_front_desk,
+    {dispenser_front_desk, start_link, [self()]},
     transient,
     brutal_kill,
     worker,
-    [dispenser_worker]
+    [dispenser_front_desk]
   },
-  ChildSpec2 = {
-    dispenser_worker2,
-    {dispenser_worker, start_link, []},
-    transient,
-    brutal_kill,
-    worker,
-    [dispenser_worker]
-  },  
-  {ok, {{one_for_all, 10, 20}, [ChildSpec, ChildSpec2]}}.
+  {ok, {{one_for_all, 10, 20}, [ChildSpec]}}.
 
 %%====================================================================
 %% Internal functions

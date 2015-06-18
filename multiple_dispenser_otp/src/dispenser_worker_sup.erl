@@ -3,7 +3,7 @@
 %% @end
 %%%-------------------------------------------------------------------
 
--module('dispenser_sup').
+-module('dispenser_worker_sup').
 
 -behaviour(supervisor).
 
@@ -36,15 +36,7 @@ init([]) ->
     worker,
     [dispenser_worker]
   },
-  ChildSpec2 = {
-    dispenser_worker2,
-    {dispenser_worker, start_link, []},
-    transient,
-    brutal_kill,
-    worker,
-    [dispenser_worker]
-  },  
-  {ok, {{one_for_all, 10, 20}, [ChildSpec, ChildSpec2]}}.
+  {ok, {{simple_one_for_one, 10, 20}, [ChildSpec]}}.
 
 %%====================================================================
 %% Internal functions
