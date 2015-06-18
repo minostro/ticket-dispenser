@@ -6,6 +6,9 @@ loop(TicketId) ->
     {From, Ref, take_ticket} ->
       From ! {self(), Ref, TicketId},
       loop(TicketId + 1);
+    {From, Ref, current_ticket} ->
+      From ! {self(), Ref, TicketId},
+      loop(TicketId);
     {reset} ->
       loop(1);
     {stop} ->
@@ -19,6 +22,13 @@ start() ->
 take_ticket(Pid) ->
   Ref = make_ref(),
   Pid ! {self(), Ref, take_ticket},
+  receive
+    {Pid, Ref, Msg} -> Msg
+  end.
+
+current_ticket(Pid) ->
+  Ref = make_ref(),
+  Pid ! {self(), Ref, current_ticket},
   receive
     {Pid, Ref, Msg} -> Msg
   end.
