@@ -36,7 +36,7 @@ init([]) ->
     worker,
     [dispenser_worker]
   },
-  {ok, {{one_for_all, 0, 1}, [ChildSpec]}}.
+  {ok, {{one_for_all, 10, 20}, [ChildSpec]}}.
 
 %%====================================================================
 %% Internal functions
