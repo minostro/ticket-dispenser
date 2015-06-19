@@ -8,7 +8,7 @@
 %% ------------------------------------------------------------------
 %% API Function Exports
 %% ------------------------------------------------------------------
--export([start/0, current_ticket/0, take_ticket/0, reset/0, stop/0]).
+-export([start/0, add_dispenser/1, current_ticket/0, take_ticket/0, reset/0, stop/0]).
 
 %% ------------------------------------------------------------------
 %% API Function Definitions

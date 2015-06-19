@@ -27,8 +27,8 @@
 start_link(SupervisorPid) ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [SupervisorPid], []).
 
- add_dispenser(Name) ->
-   ok.
+add_dispenser(Name) ->
+  gen_server:call(?SERVER, {add_dispenser, Name}).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
@@ -37,6 +37,10 @@ init([SupervisorPid]) ->
   self() ! {start_worker_supervisor, SupervisorPid},
   {ok, #state{}}.
 
+handle_call({add_dispenser, Name}, _From, #state{worker_supervisor_pid=Pid} = State) ->
+  %save the mapping between Name and new Pid on the front_desk state.
+  supervisor:start_child(Pid, []),
+  {reply, ok, State};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
