@@ -8,7 +8,7 @@
 %% ------------------------------------------------------------------
 %% API Function Exports
 %% ------------------------------------------------------------------
--export([start/0, add_dispenser/1, current_ticket/0, take_ticket/0, reset/0, stop/0]).
+-export([start/0, add_dispenser/1, current_ticket/1, take_ticket/0, reset/0, stop/0]).
 
 %% ------------------------------------------------------------------
 %% API Function Definitions
@@ -19,8 +19,8 @@ start() ->
 add_dispenser(Name) ->
 	dispenser_front_desk:add_dispenser(Name).
 
-current_ticket() ->
-  dispenser_worker:current_ticket().
+current_ticket(Name) ->
+  dispenser_front_desk:current_ticket(Name).
 
 take_ticket() ->
   dispenser_worker:take_ticket().
