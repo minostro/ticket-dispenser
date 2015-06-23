@@ -25,7 +25,7 @@
 %% API Function Definitions
 %% ------------------------------------------------------------------
 start_link() ->
-  gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+  gen_server:start_link(?MODULE, [], []).
 
 current_ticket() ->
   gen_server:call(?SERVER, current_ticket).

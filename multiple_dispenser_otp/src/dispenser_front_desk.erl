@@ -7,7 +7,7 @@
 -define(SERVER, ?MODULE).
 
 -author('Milton Inostroza <minostro@minostro.com>').
--record(state, {worker_supervisor_pid}).
+-record(state, {worker_supervisor_pid, mapping}).
 
 %% ------------------------------------------------------------------
 %% API Function Exports
@@ -35,12 +35,10 @@ add_dispenser(Name) ->
 %% ------------------------------------------------------------------
 init([SupervisorPid]) ->
   self() ! {start_worker_supervisor, SupervisorPid},
-  {ok, #state{}}.
-
-handle_call({add_dispenser, Name}, _From, #state{worker_supervisor_pid=Pid} = State) ->
-  %save the mapping between Name and new Pid on the front_desk state.
-  supervisor:start_child(Pid, []),
-  {reply, ok, State};
+  {ok, #state{mapping = #{}}}.
+handle_call({add_dispenser, Name}, _From, #state{worker_supervisor_pid = Pid, mapping = Mapping} = State) ->
+  {ok, Child} = supervisor:start_child(Pid, []),
+  {reply, ok, State#state{mapping = maps:put(Name, Child, Mapping)}};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
@@ -51,13 +49,13 @@ handle_info({start_worker_supervisor, SupervisorPid}, State) ->
   ChildSpec = {
     dispenser_worker_sup,
     {dispenser_worker_sup, start_link, []},
-    transient,
+    temporary,
     brutal_kill,
-    worker,
+    supervisor,
     [dispenser_worker_sup]
   },
   {ok, Pid} = supervisor:start_child(SupervisorPid, ChildSpec),
-  {noreply, #state{worker_supervisor_pid=Pid}};
+  {noreply, State#state{worker_supervisor_pid=Pid}};
 handle_info(_Info, State) ->
   {noreply, State}.
 
