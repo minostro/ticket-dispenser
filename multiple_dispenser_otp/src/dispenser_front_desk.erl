@@ -7,12 +7,12 @@
 -define(SERVER, ?MODULE).
 
 -author('Milton Inostroza <minostro@minostro.com>').
--record(state, {worker_supervisor_pid}).
+-record(state, {worker_supervisor_pid, mapping}).
 
 %% ------------------------------------------------------------------
 %% API Function Exports
 %% ------------------------------------------------------------------
--export([start_link/1, add_dispenser/1]).
+-export([start_link/1, add_dispenser/1, current_ticket/1]).
 
 
 %% ------------------------------------------------------------------
@@ -30,17 +30,23 @@ start_link(SupervisorPid) ->
 add_dispenser(Name) ->
   gen_server:call(?SERVER, {add_dispenser, Name}).
 
+
+current_ticket(Name) ->
+  gen_server:call(?SERVER, {current_ticket, Name}).
+
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
 %% ------------------------------------------------------------------
 init([SupervisorPid]) ->
   self() ! {start_worker_supervisor, SupervisorPid},
-  {ok, #state{}}.
-
-handle_call({add_dispenser, Name}, _From, #state{worker_supervisor_pid=Pid} = State) ->
-  %save the mapping between Name and new Pid on the front_desk state.
-  supervisor:start_child(Pid, []),
-  {reply, ok, State};
+  {ok, #state{mapping = #{}}}.
+handle_call({add_dispenser, Name}, _From, #state{worker_supervisor_pid = Pid, mapping = Mapping} = State) ->
+  {ok, Child} = supervisor:start_child(Pid, []),
+  {reply, ok, State#state{mapping = maps:put(Name, Child, Mapping)}};
+handle_call({current_ticket, Name}, _From, #state{mapping = Mapping} = State) ->
+  Worker = maps:get(Name, Mapping),
+  Ticket = dispenser_worker:current_ticket(Worker),
+  {reply, {ok, Ticket}, State};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
@@ -51,13 +57,13 @@ handle_info({start_worker_supervisor, SupervisorPid}, State) ->
   ChildSpec = {
     dispenser_worker_sup,
     {dispenser_worker_sup, start_link, []},
-    transient,
+    temporary,
     brutal_kill,
-    worker,
+    supervisor,
     [dispenser_worker_sup]
   },
   {ok, Pid} = supervisor:start_child(SupervisorPid, ChildSpec),
-  {noreply, #state{worker_supervisor_pid=Pid}};
+  {noreply, State#state{worker_supervisor_pid=Pid}};
 handle_info(_Info, State) ->
   {noreply, State}.
 
