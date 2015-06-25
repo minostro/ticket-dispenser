@@ -18,3 +18,10 @@ Toy Erlang Project
  1- Coordinator ! {create_worker}
  2- ChildPid = Cordinator calls supervisor:add_child
  3- erlang:monitor(ChildPid)
+
+Docker
+======
+
+boot2docker up
+docker build -t erlang .
+docker run -it erlang bash
