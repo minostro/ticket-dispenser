@@ -13,6 +13,4 @@ RUN apt-get install -y make
 RUN git clone https://github.com/rebar/rebar3.git
 RUN cd rebar3 && ./bootstrap && cp rebar3 /usr/local/bin/rebar3
 
-VOLUME /app
 WORKDIR /app
-ADD . /app
