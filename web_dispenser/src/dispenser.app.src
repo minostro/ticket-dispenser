@@ -1,0 +1,16 @@
+{application, 'dispenser',
+ [{description, "An OTP application"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {'dispenser_app', []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[
+    {web_ip, "0.0.0.0"},
+    {web_port, 8080}
+  ]},
+  {modules, []}
+ ]}.
+ 
