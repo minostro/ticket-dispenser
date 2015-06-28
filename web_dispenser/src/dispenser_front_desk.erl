@@ -12,7 +12,7 @@
 %% ------------------------------------------------------------------
 %% API Function Exports
 %% ------------------------------------------------------------------
--export([start_link/1, add_dispenser/1, current_ticket/1]).
+-export([start_link/1, add_dispenser/1, current_ticket/1, get_dispensers/0]).
 
 
 %% ------------------------------------------------------------------
@@ -30,9 +30,11 @@ start_link(SupervisorPid) ->
 add_dispenser(Name) ->
   gen_server:call(?SERVER, {add_dispenser, Name}).
 
-
 current_ticket(Name) ->
   gen_server:call(?SERVER, {current_ticket, Name}).
+
+get_dispensers() ->
+  gen_server:call(?SERVER, {get_dispensers}).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
@@ -42,11 +44,13 @@ init([SupervisorPid]) ->
   {ok, #state{mapping = #{}}}.
 handle_call({add_dispenser, Name}, _From, #state{worker_supervisor_pid = Pid, mapping = Mapping} = State) ->
   {ok, Child} = supervisor:start_child(Pid, []),
-  {reply, ok, State#state{mapping = maps:put(Name, Child, Mapping)}};
+  {reply, {ok, [Name, Child]}, State#state{mapping = maps:put(Name, Child, Mapping)}};
 handle_call({current_ticket, Name}, _From, #state{mapping = Mapping} = State) ->
   Worker = maps:get(Name, Mapping),
   Ticket = dispenser_worker:current_ticket(Worker),
   {reply, {ok, Ticket}, State};
+handle_call({get_dispensers}, _From, #state{mapping=Mapping} = State) ->
+  {reply, {ok, Mapping}, State};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
