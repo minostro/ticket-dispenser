@@ -5,7 +5,7 @@
 -spec dispatch() -> [webmachine_dispatcher:route()].
 dispatch() ->
     lists:flatten([
-        {["dispensers", '*'], dispenser_resource, []}
+        {["dispensers", id], dispenser_resource, []}
     ]).
 
 web_config() ->

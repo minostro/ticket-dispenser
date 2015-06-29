@@ -12,7 +12,7 @@
 %% ------------------------------------------------------------------
 %% API Function Exports
 %% ------------------------------------------------------------------
--export([start_link/1, add_dispenser/1, current_ticket/1, get_dispensers/0]).
+-export([start_link/1, add_dispenser/1, current_ticket/1, get_dispenser/1, dispenser_exists/1]).
 
 
 %% ------------------------------------------------------------------
@@ -33,8 +33,11 @@ add_dispenser(Name) ->
 current_ticket(Name) ->
   gen_server:call(?SERVER, {current_ticket, Name}).
 
-get_dispensers() ->
-  gen_server:call(?SERVER, {get_dispensers}).
+get_dispenser(Name) ->
+  gen_server:call(?SERVER, {get_dispenser, Name}).
+
+dispenser_exists(Name) ->
+  gen_server:call(?SERVER, {dispenser_exists, Name}).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
@@ -49,8 +52,11 @@ handle_call({current_ticket, Name}, _From, #state{mapping = Mapping} = State) ->
   Worker = maps:get(Name, Mapping),
   Ticket = dispenser_worker:current_ticket(Worker),
   {reply, {ok, Ticket}, State};
-handle_call({get_dispensers}, _From, #state{mapping=Mapping} = State) ->
-  {reply, {ok, Mapping}, State};
+handle_call({get_dispenser, Name}, _From, #state{mapping=Mapping} = State) ->  
+  Dispenser = [Name, maps:get(Name, Mapping, error)],
+  {reply, {ok, Dispenser}, State};
+handle_call({dispenser_exists, Name}, _From, #state{mapping=Mapping} = State) ->
+  {reply, {ok, maps:is_key(Name, Mapping)}, State};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
