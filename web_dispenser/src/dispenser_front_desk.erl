@@ -48,13 +48,13 @@ init([SupervisorPid]) ->
 handle_call({add_dispenser, Name}, _From, #state{worker_supervisor_pid = Pid, mapping = Mapping} = State) ->
   {ok, Child} = supervisor:start_child(Pid, []),
   {reply, {ok, [Name, Child]}, State#state{mapping = maps:put(Name, Child, Mapping)}};
+handle_call({get_dispenser, Name}, _From, #state{mapping=Mapping} = State) ->
+  Dispenser = [Name, maps:get(Name, Mapping, error)],
+  {reply, {ok, Dispenser}, State};
 handle_call({current_ticket, Name}, _From, #state{mapping = Mapping} = State) ->
   Worker = maps:get(Name, Mapping),
   Ticket = dispenser_worker:current_ticket(Worker),
   {reply, {ok, Ticket}, State};
-handle_call({get_dispenser, Name}, _From, #state{mapping=Mapping} = State) ->  
-  Dispenser = [Name, maps:get(Name, Mapping, error)],
-  {reply, {ok, Dispenser}, State};
 handle_call({dispenser_exists, Name}, _From, #state{mapping=Mapping} = State) ->
   {reply, {ok, maps:is_key(Name, Mapping)}, State};
 handle_call(_Request, _From, State) ->

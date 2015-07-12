@@ -5,7 +5,8 @@
   {mod, {'dispenser_app', []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    webmachine
    ]},
   {env,[
     {web_ip, "0.0.0.0"},

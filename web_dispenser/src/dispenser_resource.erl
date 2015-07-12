@@ -51,3 +51,4 @@ dispenser_to_json([Name, Pid]) ->
   mochijson:encode(
     {struct, [{name, atom_to_list(Name)},
               {pid, pid_to_list(Pid)}]}).
+
